@@ -20,7 +20,14 @@
         android:layout_height="wrap_content" />
     <TextView android:text="Y = " android:layout_marginTop="80dp" android:layout_marginLeft="20dp" android:id="@+id/y" android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    <TextView android:text="Ei pekoneita lähelläsi" android:layout_marginTop="110dp" android:layout_marginLeft="20dp" android:id="@+id/nbeacon" android:layout_width="wrap_content"
+    <TextView android:text="Beaconin vari = " android:layout_marginTop="110dp" android:layout_marginLeft="20dp" android:id="@+id/baconColor" android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-
+    <TextView android:text="Beaconin ID = " android:layout_marginTop="140dp" android:layout_marginLeft="20dp" android:id="@+id/baconID" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView android:text="distance = " android:layout_marginTop="170dp" android:layout_marginLeft="20dp" android:id="@+id/apuapu" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView android:text="apuapua = " android:layout_marginTop="200dp" android:layout_marginLeft="20dp" android:id="@+id/apuapu2" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView android:text="apuapua3 = " android:layout_marginTop="230dp" android:layout_marginLeft="20dp" android:id="@+id/apuapu3" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </RelativeLayout>

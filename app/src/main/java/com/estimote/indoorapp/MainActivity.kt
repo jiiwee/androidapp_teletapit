@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.estimote.coresdk.repackaged.retrofit_v1_9_0.retrofit.RestAdapter
 import com.estimote.coresdk.service.BeaconManager
 import com.estimote.indoorsdk.IndoorLocationManagerBuilder
 import com.estimote.indoorsdk_module.algorithm.OnPositionUpdateListener
@@ -31,10 +32,21 @@ class MainActivity : AppCompatActivity() {
 
     var currentX = "asd"
     var currentY = "asd"
+    var beaconFound = false
+
+
+    var arvo = 1
+    var testi = 1
+    var beaconNear = ""
+
+
+
+    var beaconID = ""
+
 
 
     companion object {
-        val intentKeyLocationId = "mikko-anttonen-s-location-ogl"
+        val intentKeyLocationId = "labra"
         fun createIntent(context: Context, locationId: String): Intent {
             val intent = Intent(context, MainActivity::class.java)
             intent.putExtra(intentKeyLocationId, locationId)
@@ -99,57 +111,52 @@ class MainActivity : AppCompatActivity() {
                     //x.setText("X = " + location.beacons[1].position.x)
                     //nbeacon.setText("Beacon data = " + location.beacons)
 
-                    // sininen 0
-                    // candy aka pinkki 1
-                    // lemon aka keltanen 2
-                    // beetroot aka punanen 3
+                    // candy 0
+                    // sweet beet 1
+                    // blueberry 2
+                    // lemon 3
 
                     var nearestBeacon = 10000.00
                     var beaconColor = ""
-                    var beaconID = ""
-                    for (i in location.beacons.indices)
-                    {
+                    for (i in location.beacons.indices) {
 
                         var positionX = location.beacons[i].position.x
                         var positionY = location.beacons[i].position.y
-                        var distance = Math.sqrt(((currentX - positionX) * (currentX - positionX)) + ((currentY- positionY) * (currentY- positionY)))
 
-                        if(distance < nearestBeacon){
+                        // Distanceen lasketaan matka lähimmältä beaconilta puhelimeen pythagoraan lauseen avulla
+                        var distance = Math.sqrt(((currentX - positionX) * (currentX - positionX)) + ((currentY - positionY) * (currentY - positionY)))
+
+                        if (distance < nearestBeacon) {
                             nearestBeacon = distance
                             beaconColor = location.beacons[i].beacon.color.toString()
                             beaconID = location.beacons[i].beacon.mac
+
+
+                            apuapu.setText("D = " + distance)
+                            puhelinID.setText("Bcn num" + arvo)
+                            baconID.setText("Beaconin ID = " + beaconID)
+                            baconColor.setText("Beaconin väri = " + beaconColor)
+
                         }
 
+
                     }
-                    puhelinID.setText("Pekonin ID " + beaconID)
-                    nbeacon.setText("Pekonin väri = " + beaconColor)
-                    //Log.d("Lista", "Tiedot: " + beaconColr)
 
-     /*
 
-                    var sininenX1 = location.beacons[0].position.x
-                    var sininenY1 = location.beacons[0].position.y
 
-                    var beaconX2 = location.beacons[2].position.x
-                    var beaconY2 = location.beacons[2].position.y
 
-                    var compareX1 = currentX - sininenX1
-                    var compareY1 = currentY - sininenY1
 
-                    var compareX2 = currentX - beaconX2
-                    var compareY2 = currentY - beaconY2
+                    if(beaconColor == beaconNear){
 
-                    if (Math.abs(compareX1) < Math.abs(compareX2)) {
-                        nbeacon.setText("Nearest beacon = " + location.beacons[3].beacon.color)
+                        apuapu2.setText("dont send data")
 
-                        //Log.d("asd","asd" + "Sinisen beaconin teksti")
-                        //Log.d("asd","asd" + compareX1 + " Sininen")
-                        //Log.d("asd","asd" + compareX2 + " Keltanen")
                     } else {
-                        nbeacon.setText("Nearest beacon = " + location.beacons[1].beacon.color)
-                        //Log.d("asd","asd" + "Keltaisen beaconin teksti")
+                        beaconNear = beaconColor
+                        arvo++
+                        apuapu3.setText("liukuva : " + arvo)
                     }
-*/
+
+
                 }
 
             }
