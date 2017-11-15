@@ -6,18 +6,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import com.estimote.coresdk.repackaged.retrofit_v1_9_0.retrofit.RestAdapter
-import com.estimote.coresdk.service.BeaconManager
 import com.estimote.indoorsdk.IndoorLocationManagerBuilder
 import com.estimote.indoorsdk_module.algorithm.OnPositionUpdateListener
 import com.estimote.indoorsdk_module.algorithm.ScanningIndoorLocationManager
-import com.estimote.indoorsdk_module.b.b.i
 import com.estimote.indoorsdk_module.cloud.Location
 import com.estimote.indoorsdk_module.cloud.LocationPosition
 import com.estimote.indoorsdk_module.view.IndoorLocationView
 import kotlinx.android.synthetic.main.activity_main.*
-import java.text.DecimalFormat
+import okhttp3.*
+import java.io.IOException
+
 
 /**
  * Main view for indoor location
@@ -30,20 +28,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var location: Location
     private lateinit var notification: Notification
 
-    var currentX = "asd"
-    var currentY = "asd"
-    var beaconFound = false
+    val client = OkHttpClient()
 
-
-    var arvo = 1
-    var testi = 1
+    var s = 0.0
     var beaconNear = ""
 
-
-
     var beaconID = ""
-
-
 
     companion object {
         val intentKeyLocationId = "labra"
@@ -60,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
         val android_id = Settings.Secure.getString(applicationContext.contentResolver, Settings.Secure.ANDROID_ID)
 
-        puhelinID.setText("ID = " + android_id )
+        puhelinID.setText("ID = " + android_id)
 
 
         // Declare notification that will be displayed in user's notification bar.
@@ -68,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         notification = Notification.Builder(this)
                 .setSmallIcon(R.drawable.beacon_gray)
                 .setContentTitle("Estimote Inc. \u00AE")
-                .setContentText("Indoor location is running..." + android_id)
+                .setContentText("Indoor location is running...")
                 .setPriority(Notification.PRIORITY_HIGH)
                 .build()
 
@@ -108,13 +98,8 @@ class MainActivity : AppCompatActivity() {
                     val currentY = Math.round(locationPosition.y * 100.0) / 100.0
                     x.setText("X = " + currentX.toString())
                     y.setText("Y = " + currentY.toString())
-                    //x.setText("X = " + location.beacons[1].position.x)
-                    //nbeacon.setText("Beacon data = " + location.beacons)
 
-                    // candy 0
-                    // sweet beet 1
-                    // blueberry 2
-                    // lemon 3
+                    // candy 0 , sweet beet 1 , blueberry 2, lemon 3
 
                     var nearestBeacon = 10000.00
                     var beaconColor = ""
@@ -126,42 +111,36 @@ class MainActivity : AppCompatActivity() {
                         // Distanceen lasketaan matka lähimmältä beaconilta puhelimeen pythagoraan lauseen avulla
                         var distance = Math.sqrt(((currentX - positionX) * (currentX - positionX)) + ((currentY - positionY) * (currentY - positionY)))
 
+
+                        // Kun havaitaan että joku beacon on lähellä, tallennetaan se muuttujaan
                         if (distance < nearestBeacon) {
                             nearestBeacon = distance
                             beaconColor = location.beacons[i].beacon.color.toString()
                             beaconID = location.beacons[i].beacon.mac
+                            s = nearestBeacon
 
 
-                            apuapu.setText("D = " + distance)
-                            puhelinID.setText("Bcn num" + arvo)
                             baconID.setText("Beaconin ID = " + beaconID)
                             baconColor.setText("Beaconin väri = " + beaconColor)
-
                         }
-
-
                     }
 
-
-
-
+                    run("https://tranquil-chamber-16062.herokuapp.com/api/Y", "[{\"Phoneid\":\""+ android_id + "\",\"Beaconid\":\"" + beaconID +"\",\"X\":\""+ currentX + "\",\"Y\":\"" + currentY + "\"}]")
 
                     if(beaconColor == beaconNear){
 
-                        apuapu2.setText("dont send data")
-
                     } else {
+                        if(s < 2){
                         beaconNear = beaconColor
-                        arvo++
-                        apuapu3.setText("liukuva : " + arvo)
+
+
+                        run("https://tranquil-chamber-16062.herokuapp.com/api/Yes", "[{\"Phoneid\":\""+ android_id + "\",\"Beaconid\":\"" + beaconID +"\"}]")
+                        } else {
+
+                        }
                     }
-
-
                 }
-
             }
-
-
         })
 
         // Start positioning in onCreate. Because we are using withScannerInForegroundService(...)
@@ -170,11 +149,20 @@ class MainActivity : AppCompatActivity() {
         // You can enable indoor positioning even when an app is killed, but you will need to start/stop
         // positioning in your object that extends Application -> in case of this app, the IndoorApplication.kt file
         indoorLocationManager.startPositioning()
+    }
 
+    fun run(url: String, data : String) {
 
-        //hello.setText("ID = " + android_id + "\n" + "Start Location X = " + LocationPosition().x + "\n" +
-          //      "Start Location y = " + LocationPosition().y )
+    val body = RequestBody.create(MediaType.parse("application/json"), data )
+      val request = Request.Builder()
+                .url(url)
+                .post(body)
+                .build()
 
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+            override fun onResponse(call: Call, response: Response) = println(response.body()?.string())
+        })
     }
 
     private fun setupLocation() {
@@ -196,3 +184,5 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 }
+
+// run("https://tranquil-chamber-16062.herokuapp.com/api/Y", "[{\"Phoneid\":\""+ android_id + "\",\"Beaconid\":\"" + beaconID +"\",\"X\":\""+ currentX + "\",\"Y\":\"" + currentY + "\"}]")
